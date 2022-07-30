@@ -18,12 +18,16 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 
 app.use((req, res, next) => {
   req.user = {
-    _id: '62dd216f9e6df32011bc3e40',
+    _id: '62e4facf385cb3fe69b99b62',
   };
   next();
 });
 app.use(users);
 app.use(cards);
+
+app.use('*', (req, res) => {
+  res.status(404).send({ message: 'Неверный путь' });
+});
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);

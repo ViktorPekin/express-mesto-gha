@@ -1,13 +1,33 @@
 const User = require('../models/user');
+const { ERROR_NOT_FOUND, ERROR_BAD_REQUEST, ERROR_INTERNAL_SERVER } = require('../utils/errors');
 
 const errors = (err, res, messageErrors) => {
   if (err === 'CastError') {
-    return res.status(404).send({ message: 'Пользователь с указанным _id не найден.' });
+    return res.status(ERROR_NOT_FOUND).send({ message: 'Пользователь с указанным _id не найден.' });
   }
-  if (err.name === 'ValidationError') {
-    return res.status(400).send({ message: messageErrors });
+  if (err === 'ValidationError') {
+    return res.status(ERROR_BAD_REQUEST).send({ message: messageErrors });
   }
-  return res.status(500).send({ message: 'Произошла ошибка' });
+  return res.status(ERROR_INTERNAL_SERVER).send({ message: 'Произошла ошибка' });
+};
+
+exports.checkId = (req, res, next) => {
+  User.findById(req.params.id)
+    .then((user) => {
+      if (user === null) {
+        errors('CastError', res, 'Пользователя с данным _id не существует');
+        return;
+      }
+      next();
+    });
+};
+
+exports.checkValidId = (req, res, next) => {
+  if (req.params.id.length !== 24) {
+    errors('ValidationError', res, 'Передан некорректный _id');
+    return;
+  }
+  next();
 };
 
 exports.getUsers = (req, res) => {

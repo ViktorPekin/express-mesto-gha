@@ -7,6 +7,8 @@ const { ERROR_NOT_FOUND } = require('./utils/errors');
 
 const users = require('./routes/users');
 const cards = require('./routes/cards');
+const { createUser, login } = require('./controllers/users');
+const auth = require('./middlewares/auth');
 
 const app = express();
 
@@ -17,12 +19,11 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useUnifiedTopology: true,
 });
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '62e4facf385cb3fe69b99b62',
-  };
-  next();
-});
+app.post('/signup', createUser);
+app.post('/signin', login);
+
+app.use(auth);
+
 app.use(users);
 app.use(cards);
 

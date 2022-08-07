@@ -1,4 +1,7 @@
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+
 const { ERROR_NOT_FOUND, ERROR_BAD_REQUEST, ERROR_INTERNAL_SERVER } = require('../utils/errors');
 
 const errors = (err, res, messageErrors) => {
@@ -41,11 +44,35 @@ exports.getUserById = (req, res) => {
     .catch((err) => errors(err.name, res));
 };
 
-exports.postUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
+exports.createUser = (req, res) => {
+  const { email } = req.body;
+  bcrypt.hash(req.body.password, 10)
+    .then((hash) => User.create(
+      {
+        email,
+        password: hash,
+      },
+    ))
     .then((user) => res.send({ user }))
     .catch((err) => errors(err.name, res, 'Переданы некорректные данные при добавления профиля.'));
+};
+
+exports.login = (req, res) => {
+  const { email, password } = req.body;
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign(
+        { _id: user._id },
+        'some-secret-key',
+        { expiresIn: '7d' },
+      );
+      res.send({ token });
+    })
+    .catch((err) => {
+      res
+        .status(401)
+        .send({ message: err.message });
+    });
 };
 
 exports.patchUser = (req, res) => {

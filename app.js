@@ -50,6 +50,10 @@ app.use(cards);
 
 app.use(errors());
 
+app.use('*', (req, res) => {
+  res.status(ERROR_NOT_FOUND).send({ message: 'Неверный путь' });
+});
+
 app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
   res.status(statusCode).send({
@@ -57,12 +61,7 @@ app.use((err, req, res, next) => {
       ? 'На сервере произошла ошибка'
       : message,
   });
-  res.status(err.statusCode).send({ message: err.message });
   next();
-});
-
-app.use('*', (req, res) => {
-  res.status(ERROR_NOT_FOUND).send({ message: 'Неверный путь' });
 });
 
 app.listen(PORT, () => {

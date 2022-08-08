@@ -1,8 +1,18 @@
 const cardRoutes = require('express').Router();
+const { celebrate, Joi } = require('celebrate');
 const cardControllers = require('../controllers/cards');
 
 cardRoutes.get('/cards', cardControllers.getCards);
-cardRoutes.post('/cards', cardControllers.postCard);
+cardRoutes.post(
+  '/cards',
+  celebrate({
+    body: Joi.object().keys({
+      name: Joi.string().required().min(2),
+      link: Joi.string().required().min(2),
+    }),
+  }),
+  cardControllers.postCard,
+);
 
 cardRoutes.delete('/cards/:cardId', cardControllers.checkValidId);
 cardRoutes.delete('/cards/:cardId', cardControllers.checkId);

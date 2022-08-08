@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const { celebrate, Joi, errors } = require('celebrate');
 
 const { PORT = 3000 } = process.env;
 const { ERROR_NOT_FOUND } = require('./utils/errors');
@@ -19,13 +20,33 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useUnifiedTopology: true,
 });
 
-app.post('/signup', createUser);
-app.post('/signin', login);
+app.post(
+  '/signup',
+  celebrate({
+    body: Joi.object().keys({
+      email: Joi.string().required().min(6).email(),
+      password: Joi.string().required().min(6),
+    }),
+  }),
+  createUser,
+);
+app.post(
+  '/signin',
+  celebrate({
+    body: Joi.object().keys({
+      email: Joi.string().required().min(6).email(),
+      password: Joi.string().required().min(6),
+    }),
+  }),
+  login,
+);
 
 app.use(auth);
 
 app.use(users);
 app.use(cards);
+
+app.use(errors());
 
 app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;

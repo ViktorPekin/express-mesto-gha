@@ -27,6 +27,22 @@ app.use(auth);
 app.use(users);
 app.use(cards);
 
+app.use((err, req, res, next) => {
+  const { statusCode = 500, message } = err;
+  if (err.code === 11000) {
+    res.status(401).send({ message: 'Необходима авторизация' });
+  }
+  res
+    .status(statusCode)
+    .send({
+      message: statusCode === 500
+        ? 'На сервере произошла ошибка'
+        : message,
+    });
+  res.status(err.statusCode).send({ message: err.message });
+  next();
+});
+
 app.use('*', (req, res) => {
   res.status(ERROR_NOT_FOUND).send({ message: 'Неверный путь' });
 });

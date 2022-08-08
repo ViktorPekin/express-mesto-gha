@@ -1,70 +1,70 @@
 const Card = require('../models/card');
-const { ERROR_NOT_FOUND, ERROR_BAD_REQUEST, ERROR_INTERNAL_SERVER } = require('../utils/errors');
-
-const errors = (err, res, messageErrors) => {
-  if (err === 'CastError') {
-    return res.status(ERROR_NOT_FOUND).send({ message: 'Карточка с указанным _id не найдена.' });
-  }
-  if (err === 'ValidationError') {
-    return res.status(ERROR_BAD_REQUEST).send({ message: messageErrors });
-  }
-  return res.status(ERROR_INTERNAL_SERVER).send({ message: 'Произошла ошибка' });
-};
+const NotFoundError = require('../utils/NotFoundError');
+const BadRequestError = require('../utils/BadRequestError');
 
 exports.checkValidId = (req, res, next) => {
   if (req.params.cardId.length !== 24) {
-    errors('ValidationError', res, 'Передан некорректный _id');
-    return;
+    const err = new BadRequestError('Передан некорректный _id');
+    next(err);
+  } else {
+    next();
   }
-  next();
 };
 
 exports.checkId = (req, res, next) => {
   Card.findById(req.params.cardId)
     .then((card) => {
       if (card === null) {
-        errors('CastError', res, 'Карточки с данным _id не существует');
-        return;
+        throw new NotFoundError('Карточки с данным _id не существует');
       }
       next();
-    });
+    }).catch(next);
 };
 
-exports.getCards = (req, res) => {
+exports.getCards = (req, res, next) => {
   Card.find({}).then((card) => res.send({ card }))
-    .catch((err) => errors(err.name, res));
+    .catch(next);
 };
 
-exports.deleteCard = (req, res) => {
+exports.deleteCard = (req, res, next) => {
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => res.send({ card }))
-    .catch((err) => errors(err.name, res));
+    .catch(next);
 };
 
-exports.postCard = (req, res) => {
+exports.postCard = (req, res, next) => {
   const { name, link } = req.body;
   const owner = req.user._id;
   Card.create({ name, link, owner })
     .then((card) => res.send({ card }))
-    .catch((err) => errors(err.name, res, 'Переданы некорректные данные при создании карточки'));
+    .catch(() => {
+      throw new BadRequestError('Переданы некорректные данные при создании карточки');
+    })
+    .catch(next);
 };
 
-exports.putLikes = (req, res) => {
+exports.putLikes = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
     .then((card) => res.send({ card }))
-    .catch((err) => errors(err.name, res, 'Переданы некорректные данные для постановки лайка.'));
+    .catch(() => {
+      throw new BadRequestError('Переданы некорректные данные для постановки лайка.');
+    })
+    .catch(next);
 };
 
-exports.deleteLikes = (req, res) => {
+exports.deleteLikes = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
     { new: true },
   )
     .then((card) => res.send({ card }))
-    .catch((err) => errors(err.name, res, 'Переданы некорректные данные для снятия лайка.'));
+    .catch(() => {
+      throw new BadRequestError('Переданы некорректные данные для снятия лайка.');
+    })
+    .catch(next);
 };

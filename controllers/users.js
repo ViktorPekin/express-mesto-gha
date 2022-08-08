@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
 const BadRequestError = require('../utils/BadRequestError');
+const RepetitionError = require('../utils/RepetitionError');
 
 exports.getUser = (req, res, next) => {
   User.findById(req.user._id).then((user) => res.send({ user }))
@@ -21,9 +22,13 @@ exports.createUser = (req, res, next) => {
         avatar,
       },
     ))
-    .then(() => res.send({ message: 'Пользователь зарегестрирован' }))
-    .catch(() => {
-      throw new BadRequestError('Переданы некорректные данные при регистрации.');
+    .then((user) => res.send({ user }))
+    .catch((err) => {
+      if (err.code === 11000) {
+        throw new RepetitionError('Пользователь с таким Email уже существует');
+      } else {
+        throw new BadRequestError('Переданы некорректные данные при регистрации.');
+      }
     })
     .catch(next);
 };

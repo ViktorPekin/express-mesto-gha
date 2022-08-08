@@ -26,6 +26,8 @@ app.post(
     body: Joi.object().keys({
       email: Joi.string().required().min(6).email(),
       password: Joi.string().required().min(6),
+      name: Joi.string().min(2).max(30),
+      about: Joi.string().min(2).max(30),
     }),
   }),
   createUser,
@@ -50,16 +52,11 @@ app.use(errors());
 
 app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
-  if (err.code === 11000) {
-    res.status(401).send({ message: 'Необходима авторизация' });
-  }
-  res
-    .status(statusCode)
-    .send({
-      message: statusCode === 500
-        ? 'На сервере произошла ошибка'
-        : message,
-    });
+  res.status(statusCode).send({
+    message: statusCode === 500
+      ? 'На сервере произошла ошибка'
+      : message,
+  });
   res.status(err.statusCode).send({ message: err.message });
   next();
 });

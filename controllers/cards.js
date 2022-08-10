@@ -1,6 +1,5 @@
 const Card = require('../models/card');
 const NotFoundError = require('../utils/NotFoundError');
-const BadRequestError = require('../utils/BadRequestError');
 const AccessError = require('../utils/AccessError');
 
 exports.checkId = (req, res, next) => {
@@ -26,10 +25,14 @@ exports.deleteCard = (req, res, next) => {
           .then((cardDel) => res.send({ cardDel }))
           .catch(next);
       } else {
-        throw new AccessError('Удаление чужой карточки запрещено');
+        const accessError = new AccessError('Удаление чужой карточки запрещено');
+        next(accessError);
       }
     })
-    .catch(next);
+    .catch(() => {
+      const castError = new NotFoundError('Карточки с данным _id не существует');
+      next(castError);
+    });
 };
 
 exports.postCard = (req, res, next) => {
@@ -37,9 +40,6 @@ exports.postCard = (req, res, next) => {
   const owner = req.user._id;
   Card.create({ name, link, owner })
     .then((card) => res.send({ card }))
-    .catch(() => {
-      throw new BadRequestError('Переданы некорректные данные при создании карточки');
-    })
     .catch(next);
 };
 
@@ -50,9 +50,6 @@ exports.putLikes = (req, res, next) => {
     { new: true },
   )
     .then((card) => res.send({ card }))
-    .catch(() => {
-      throw new BadRequestError('Переданы некорректные данные для постановки лайка.');
-    })
     .catch(next);
 };
 
@@ -63,8 +60,5 @@ exports.deleteLikes = (req, res, next) => {
     { new: true },
   )
     .then((card) => res.send({ card }))
-    .catch(() => {
-      throw new BadRequestError('Переданы некорректные данные для снятия лайка.');
-    })
     .catch(next);
 };

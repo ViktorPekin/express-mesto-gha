@@ -10,7 +10,7 @@ userRoutes.get(
   '/users/:id',
   celebrate({
     params: Joi.object().keys({
-      id: Joi.string().alphanum().length(24),
+      id: Joi.string().alphanum().length(24).hex(),
     }),
   }),
   userControllers.getUserById,
@@ -20,8 +20,8 @@ userRoutes.patch(
   '/users/me',
   celebrate({
     body: Joi.object().keys({
-      name: Joi.string().required().min(2).max(30),
-      about: Joi.string().required().min(2).max(30),
+      name: Joi.string().min(2).max(30),
+      about: Joi.string().min(2).max(30),
     }),
   }),
   userControllers.patchUser,

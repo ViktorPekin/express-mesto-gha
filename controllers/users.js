@@ -2,7 +2,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
-const BadRequestError = require('../utils/BadRequestError');
 const RepetitionError = require('../utils/RepetitionError');
 const NotFoundError = require('../utils/NotFoundError');
 
@@ -53,12 +52,10 @@ exports.createUser = (req, res, next) => {
     ))
     .catch((err) => {
       if (err.code === 11000) {
-        throw new RepetitionError('Пользователь с таким Email уже существует');
-      } else {
-        throw new BadRequestError('Переданы некорректные данные при регистрации.');
+        const error = new RepetitionError('Пользователь с таким Email уже существует');
+        next(error);
       }
-    })
-    .catch(next);
+    });
 };
 
 exports.login = (req, res, next) => {
@@ -83,12 +80,14 @@ exports.patchUser = (req, res, next) => {
     {
       new: true,
       runValidators: true,
-      upsert: true,
     },
   )
-    .then((user) => res.send({ user }))
-    .catch(() => {
-      throw new BadRequestError('Переданы некорректные данные при обновлении профиля.');
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundError('Пользователь не найден');
+      } else {
+        res.send({ user });
+      }
     })
     .catch(next);
 };
@@ -101,12 +100,14 @@ exports.patchAvatar = (req, res, next) => {
     {
       new: true,
       runValidators: true,
-      upsert: true,
     },
   )
-    .then((user) => res.send({ user }))
-    .catch(() => {
-      throw new BadRequestError('Переданы некорректные данные при обновлении аватара.');
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundError('Пользователь не найден');
+      } else {
+        res.send({ user });
+      }
     })
     .catch(next);
 };

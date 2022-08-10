@@ -4,13 +4,14 @@ const bodyParser = require('body-parser');
 const { celebrate, Joi, errors } = require('celebrate');
 
 const { PORT = 3000 } = process.env;
-const { ERROR_NOT_FOUND, ERROR_INTERNAL_SERVER } = require('./utils/errors');
+const { ERROR_INTERNAL_SERVER } = require('./utils/errors');
 const { linkRegular } = require('./utils/regularExpressions');
 
 const users = require('./routes/users');
 const cards = require('./routes/cards');
 const { createUser, login } = require('./controllers/users');
 const auth = require('./middlewares/auth');
+const NotFoundError = require('./utils/NotFoundError');
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.post(
   }),
   login,
 );
+
 app.post(
   '/signup',
   celebrate({
@@ -52,8 +54,9 @@ app.use(cards);
 
 app.use(errors());
 
-app.use('*', (req, res) => {
-  res.status(ERROR_NOT_FOUND).send({ message: 'Неверный путь' });
+app.use('*', (req, res, next) => {
+  const err = new NotFoundError('Неверный путь');
+  next(err);
 });
 
 app.use((err, req, res, next) => {

@@ -19,7 +19,7 @@ cardRoutes.delete(
   '/cards/:cardId',
   celebrate({
     params: Joi.object().keys({
-      cardId: Joi.string().alphanum().length(24),
+      cardId: Joi.string().alphanum().length(24).hex(),
     }),
   }),
   cardControllers.checkId,
@@ -29,7 +29,7 @@ cardRoutes.delete(
   '/cards/:cardId',
   celebrate({
     params: Joi.object().keys({
-      cardId: Joi.string().alphanum().length(24),
+      cardId: Joi.string().alphanum().length(24).hex(),
     }),
   }),
   cardControllers.deleteCard,
@@ -39,7 +39,7 @@ cardRoutes.put(
   '/cards/:cardId/likes',
   celebrate({
     params: Joi.object().keys({
-      cardId: Joi.string().alphanum().length(24),
+      cardId: Joi.string().alphanum().length(24).hex(),
     }),
   }),
   cardControllers.checkId,
@@ -48,7 +48,7 @@ cardRoutes.put(
   '/cards/:cardId/likes',
   celebrate({
     params: Joi.object().keys({
-      cardId: Joi.string().alphanum().length(24),
+      cardId: Joi.string().alphanum().length(24).hex(),
     }),
   }),
   cardControllers.putLikes,
@@ -58,7 +58,7 @@ cardRoutes.delete(
   '/cards/:cardId/likes',
   celebrate({
     params: Joi.object().keys({
-      cardId: Joi.string().alphanum().length(24),
+      cardId: Joi.string().alphanum().length(24).hex(),
     }),
   }),
   cardControllers.checkId,
@@ -67,7 +67,7 @@ cardRoutes.delete(
   '/cards/:cardId/likes',
   celebrate({
     params: Joi.object().keys({
-      cardId: Joi.string().alphanum().length(24),
+      cardId: Joi.string().alphanum().length(24).hex(),
     }),
   }),
   cardControllers.deleteLikes,

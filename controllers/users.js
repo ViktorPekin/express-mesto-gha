@@ -4,6 +4,7 @@ const User = require('../models/user');
 
 const BadRequestError = require('../utils/BadRequestError');
 const RepetitionError = require('../utils/RepetitionError');
+const NotFoundError = require('../utils/NotFoundError');
 
 exports.getUserMe = (req, res, next) => {
   User.findById(req.user._id).then((user) => res.send({ user }))
@@ -17,7 +18,13 @@ exports.getUsers = (req, res, next) => {
 
 exports.getUserById = (req, res, next) => {
   User.findById(req.params.id)
-    .then((user) => res.send({ user }))
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundError('Пользователя с данный Id не существует');
+      } else {
+        res.send({ user });
+      }
+    })
     .catch(next);
 };
 

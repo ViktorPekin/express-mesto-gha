@@ -30,7 +30,7 @@ exports.getCards = (req, res, next) => {
 exports.deleteCard = (req, res, next) => {
   Card.findById(req.params.cardId)
     .then((card) => {
-      if (card.owner === req.user._id) {
+      if (card.owner._id.toString() === req.user._id) {
         Card.findByIdAndRemove(req.params.cardId)
           .then((cardDel) => res.send({ cardDel }))
           .catch(next);

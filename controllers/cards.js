@@ -3,15 +3,6 @@ const NotFoundError = require('../utils/NotFoundError');
 const BadRequestError = require('../utils/BadRequestError');
 const AccessError = require('../utils/AccessError');
 
-exports.checkValidId = (req, res, next) => {
-  if (req.params.cardId.length !== 24) {
-    const err = new BadRequestError('Передан некорректный _id');
-    next(err);
-  } else {
-    next();
-  }
-};
-
 exports.checkId = (req, res, next) => {
   Card.findById(req.params.cardId)
     .then((card) => {

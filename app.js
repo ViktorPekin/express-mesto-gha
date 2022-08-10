@@ -4,7 +4,8 @@ const bodyParser = require('body-parser');
 const { celebrate, Joi, errors } = require('celebrate');
 
 const { PORT = 3000 } = process.env;
-const { ERROR_NOT_FOUND } = require('./utils/errors');
+const { ERROR_NOT_FOUND, ERROR_INTERNAL_SERVER } = require('./utils/errors');
+const { linkRegular } = require('./utils/regularExpressions');
 
 const users = require('./routes/users');
 const cards = require('./routes/cards');
@@ -38,7 +39,7 @@ app.post(
       password: Joi.string().required(),
       name: Joi.string().min(2).max(30),
       about: Joi.string().min(2).max(30),
-      avatar: Joi.string().pattern(/^((ftp|http|https):\/\/)?(www\.)?([A-Za-zА-Яа-я0-9]{1}[A-Za-zА-Яа-я0-9\-]*\.?)*\.{1}[A-Za-zА-Яа-я0-9-]{2,8}(\/([\w#!:.?+=&%@!\-\/])*)?/),
+      avatar: Joi.string().pattern(linkRegular),
     }),
   }),
   createUser,
@@ -56,9 +57,9 @@ app.use('*', (req, res) => {
 });
 
 app.use((err, req, res, next) => {
-  const { statusCode = 500, message } = err;
+  const { statusCode = ERROR_INTERNAL_SERVER, message } = err;
   res.status(statusCode).send({
-    message: statusCode === 500
+    message: statusCode === ERROR_INTERNAL_SERVER
       ? 'На сервере произошла ошибка'
       : message,
   });

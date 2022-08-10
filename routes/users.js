@@ -1,6 +1,7 @@
 const userRoutes = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
 const userControllers = require('../controllers/users');
+const { linkRegular } = require('../utils/regularExpressions');
 
 userRoutes.get('/users', userControllers.getUsers);
 userRoutes.get('/users/me', userControllers.getUserMe);
@@ -29,7 +30,7 @@ userRoutes.patch(
   '/users/me/avatar',
   celebrate({
     body: Joi.object().keys({
-      avatar: Joi.string().required().pattern(/^((ftp|http|https):\/\/)?(www\.)?([A-Za-zА-Яа-я0-9]{1}[A-Za-zА-Яа-я0-9\-]*\.?)*\.{1}[A-Za-zА-Яа-я0-9-]{2,8}(\/([\w#!:.?+=&%@!\-\/])*)?/),
+      avatar: Joi.string().required().pattern(linkRegular),
     }),
   }),
   userControllers.patchAvatar,

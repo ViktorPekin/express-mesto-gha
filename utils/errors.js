@@ -1,3 +1,2 @@
 exports.ERROR_NOT_FOUND = 404;
-exports.ERROR_BAD_REQUEST = 400;
 exports.ERROR_INTERNAL_SERVER = 500;

@@ -40,7 +40,17 @@ exports.createUser = (req, res, next) => {
         avatar,
       },
     ))
-    .then((user) => res.send({ user }))
+    .then((user) => res.send(
+      {
+        user: {
+          email: user.email,
+          name: user.name,
+          about: user.about,
+          avatar: user.avatar,
+          _id: user._id,
+        },
+      },
+    ))
     .catch((err) => {
       if (err.code === 11000) {
         throw new RepetitionError('Пользователь с таким Email уже существует');

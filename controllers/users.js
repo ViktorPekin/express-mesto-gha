@@ -5,8 +5,19 @@ const User = require('../models/user');
 const BadRequestError = require('../utils/BadRequestError');
 const RepetitionError = require('../utils/RepetitionError');
 
-exports.getUser = (req, res, next) => {
+exports.getUserMe = (req, res, next) => {
   User.findById(req.user._id).then((user) => res.send({ user }))
+    .catch(next);
+};
+
+exports.getUsers = (req, res, next) => {
+  User.find({}).then((user) => res.send({ user }))
+    .catch(next);
+};
+
+exports.getUserById = (req, res, next) => {
+  User.findById(req.params.id)
+    .then((user) => res.send({ user }))
     .catch(next);
 };
 

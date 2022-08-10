@@ -2,7 +2,9 @@ const userRoutes = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
 const userControllers = require('../controllers/users');
 
-userRoutes.get('/users/me', userControllers.getUser);
+userRoutes.get('/users', userControllers.getUsers);
+userRoutes.get('/users/me', userControllers.getUserMe);
+userRoutes.get('/users/:id', userControllers.getUserById);
 userRoutes.patch(
   '/users/me',
   celebrate({

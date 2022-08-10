@@ -1,6 +1,7 @@
 const Card = require('../models/card');
 const NotFoundError = require('../utils/NotFoundError');
 const BadRequestError = require('../utils/BadRequestError');
+const AccessError = require('../utils/AccessError');
 
 exports.checkValidId = (req, res, next) => {
   if (req.params.cardId.length !== 24) {
@@ -27,8 +28,16 @@ exports.getCards = (req, res, next) => {
 };
 
 exports.deleteCard = (req, res, next) => {
-  Card.findByIdAndRemove(req.params.cardId)
-    .then((card) => res.send({ card }))
+  Card.findById(req.params.cardId)
+    .then((card) => {
+      if (card.owner === req.user._id) {
+        Card.findByIdAndRemove(req.params.cardId)
+          .then((cardDel) => res.send({ cardDel }))
+          .catch(next);
+      } else {
+        throw new AccessError('Удаление чужой карточки запрещено');
+      }
+    })
     .catch(next);
 };
 

@@ -4,10 +4,12 @@ const userControllers = require('../controllers/users');
 
 userRoutes.get('/users', userControllers.getUsers);
 userRoutes.get('/users/me', userControllers.getUserMe);
-userRoutes.get('/users/:id',
+
+userRoutes.get(
+  '/users/:id',
   celebrate({
     params: Joi.object().keys({
-      postId: Joi.string().alphanum().length(24),
+      id: Joi.string().alphanum().length(24),
     }),
   }),
   userControllers.getUserById,

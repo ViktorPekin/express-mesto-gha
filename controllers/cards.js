@@ -1,6 +1,7 @@
 const Card = require('../models/card');
 const NotFoundError = require('../utils/NotFoundError');
 const AccessError = require('../utils/AccessError');
+const BadRequestError = require('../utils/BadRequestError');
 
 exports.checkId = (req, res, next) => {
   Card.findById(req.params.cardId)
@@ -29,9 +30,11 @@ exports.deleteCard = (req, res, next) => {
         next(accessError);
       }
     })
-    .catch(() => {
-      const castError = new NotFoundError('Карточки с данным _id не существует');
-      next(castError);
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new NotFoundError('Карточки с данным _id не существует'));
+      }
+      next(err);
     });
 };
 
@@ -40,7 +43,13 @@ exports.postCard = (req, res, next) => {
   const owner = req.user._id;
   Card.create({ name, link, owner })
     .then((card) => res.send({ card }))
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new BadRequestError('Неправельно введены данные'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 exports.putLikes = (req, res, next) => {
@@ -50,7 +59,12 @@ exports.putLikes = (req, res, next) => {
     { new: true },
   )
     .then((card) => res.send({ card }))
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new NotFoundError('Карточки с данным _id не существует'));
+      }
+      next(err);
+    });
 };
 
 exports.deleteLikes = (req, res, next) => {
@@ -60,5 +74,10 @@ exports.deleteLikes = (req, res, next) => {
     { new: true },
   )
     .then((card) => res.send({ card }))
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new NotFoundError('Карточки с данным _id не существует'));
+      }
+      next(err);
+    });
 };

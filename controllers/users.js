@@ -4,6 +4,7 @@ const User = require('../models/user');
 
 const RepetitionError = require('../utils/RepetitionError');
 const NotFoundError = require('../utils/NotFoundError');
+const BadRequestError = require('../utils/BadRequestError');
 
 exports.getUserMe = (req, res, next) => {
   User.findById(req.user._id).then((user) => res.send({ user }))
@@ -52,8 +53,11 @@ exports.createUser = (req, res, next) => {
     ))
     .catch((err) => {
       if (err.code === 11000) {
-        const error = new RepetitionError('Пользователь с таким Email уже существует');
-        next(error);
+        next(new RepetitionError('Пользователь с таким Email уже существует'));
+      } else if (err.name === 'ValidationError') {
+        next(new BadRequestError('Неправельно введены данные'));
+      } else {
+        next(err);
       }
     });
 };

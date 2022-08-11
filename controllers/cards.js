@@ -33,8 +33,9 @@ exports.deleteCard = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new NotFoundError('Карточки с данным _id не существует'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -62,8 +63,9 @@ exports.putLikes = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new NotFoundError('Карточки с данным _id не существует'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -77,7 +79,8 @@ exports.deleteLikes = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new NotFoundError('Карточки с данным _id не существует'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };

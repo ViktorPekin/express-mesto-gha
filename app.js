@@ -22,7 +22,7 @@ app.use(bodyParser.json());
 const allowedCors = [
   'https://praktikum.tk',
   'http://praktikum.tk',
-  'localhost:3000',
+  'http://localhost:3000',
 ];
 
 app.use((req, res, next) => {

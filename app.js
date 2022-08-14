@@ -22,16 +22,16 @@ app.use(bodyParser.json());
 const allowedCors = [
   'https://praktikum.tk',
   'http://praktikum.tk',
-  'http://localhost:3000',
+  'localhost:3000',
 ];
 
 app.use((req, res, next) => {
   const { origin } = req.headers;
 
-  if (allowedCors.includes(origin)) {
+/*   if (allowedCors.includes(origin)) {
     res.header('Access-Control-Allow-Origin', origin);
-  }
-
+  } */
+  res.header('Access-Control-Allow-Origin', "*");
   const { method } = req;
   const DEFAULT_ALLOWED_METHODS = 'GET,HEAD,PUT,PATCH,POST,DELETE';
 

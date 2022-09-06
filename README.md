@@ -10,3 +10,6 @@ Node.Js / Express / MongoDb / Mongoose / Joi / Celebrate
 `npm run start` — запускает сервер
 <br>
 `npm run dev` — запускает сервер с hot-reload
+
+## Статус 
+-✅ Завершен
